@@ -3,6 +3,7 @@ package can.springframework.msscbeerservice.web.controller;
 import can.springframework.msscbeerservice.web.model.BeerDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.xml.ws.Response;
@@ -18,13 +19,13 @@ public class BeerController {
     }
 
     @PostMapping
-    public ResponseEntity saveNewBeer(@RequestBody BeerDto beerDto){
+    public ResponseEntity saveNewBeer(@RequestBody @Validated BeerDto beerDto){
         return new ResponseEntity(HttpStatus.CREATED);
 
     }
 
     @PutMapping("/{beerId}")
-    public ResponseEntity updateBeerById(@PathVariable UUID beerId,@RequestBody BeerDto beerDto){
+    public ResponseEntity updateBeerById(@PathVariable UUID beerId,@RequestBody @Validated BeerDto beerDto){
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
