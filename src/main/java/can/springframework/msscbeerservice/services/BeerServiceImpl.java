@@ -23,36 +23,13 @@ public class BeerServiceImpl implements BeerService {
 
     private final BeerRepository beerRepository;
     private final BeerMapper beerMapper;
-    @Override
-    public BeerDto getById(UUID beerId,Boolean showInventoryOnHand) {
-        if(showInventoryOnHand) {
-            return beerMapper.beerToBeerDtoWithInventory(
-                    beerRepository.findById(beerId).orElseThrow(NotFoundException::new)
-            );
-        }else {
-            return beerMapper.beerToBeerDto(beerRepository.findById(beerId).orElseThrow(NotFoundException::new));
-        }
-    }
 
-    @Override
-    public BeerDto saveNewBeer(BeerDto beerDto) {
-        return beerMapper.beerToBeerDto(beerRepository.save(beerMapper.beerDtoToBeer(beerDto)));
-    }
 
-    @Override
-    public BeerDto updateBeer(UUID beerId, BeerDto beerDto) {
-        Beer beer = beerRepository.findById(beerId).orElseThrow(NotFoundException::new);
-
-        beer.setBeerName(beerDto.getBeerName());
-        beer.setBeerStyle(beerDto.getBeerStyle().name());
-        beer.setPrice(beerDto.getPrice());
-        beer.setUpc(beerDto.getUpc());
-        return beerMapper.beerToBeerDto(beerRepository.save(beer));
-    }
-
-    @Cacheable(cacheNames = "beerListCache", condition = "#showInventoryOnHand == false ")
+    @Cacheable(cacheNames = "beerListCache", condition = "#showInventoryOnHand == false ") //showInventoryOnHand = false olduğunda cache mekanizması çalışır
     @Override
     public BeerPageList listBeers(String beerName, BeerStyleEnum beerStyle, PageRequest pageRequest, Boolean showInventoryOnHand) {
+
+        System.out.println("cağrıldı");
         BeerPageList beerPagedList;
         Page<Beer> beerPage;
 
@@ -92,5 +69,40 @@ public class BeerServiceImpl implements BeerService {
         }
 
         return beerPagedList;
+    }
+    @Cacheable(cacheNames = "beerCache", key = "#beerId", condition = "#showInventoryOnHand == false ") //showInventoryOnHand = false olduğunda cache mekanizması çalışır
+    @Override
+    public BeerDto getById(UUID beerId,Boolean showInventoryOnHand) {
+        if(showInventoryOnHand) {
+            return beerMapper.beerToBeerDtoWithInventory(
+                    beerRepository.findById(beerId).orElseThrow(NotFoundException::new)
+            );
+        }else {
+            return beerMapper.beerToBeerDto(beerRepository.findById(beerId).orElseThrow(NotFoundException::new));
+        }
+    }
+
+    @Override
+    public BeerDto saveNewBeer(BeerDto beerDto) {
+        return beerMapper.beerToBeerDto(beerRepository.save(beerMapper.beerDtoToBeer(beerDto)));
+    }
+
+    @Override
+    public BeerDto updateBeer(UUID beerId, BeerDto beerDto) {
+        Beer beer = beerRepository.findById(beerId).orElseThrow(NotFoundException::new);
+
+        beer.setBeerName(beerDto.getBeerName());
+        beer.setBeerStyle(beerDto.getBeerStyle().name());
+        beer.setPrice(beerDto.getPrice());
+        beer.setUpc(beerDto.getUpc());
+        return beerMapper.beerToBeerDto(beerRepository.save(beer));
+    }
+
+
+
+    @Cacheable(cacheNames = "beerUpcCache")
+    @Override
+    public BeerDto findByUpc(String upc) {
+        return beerMapper.beerToBeerDtoWithInventory(beerRepository.findByUpc(upc));
     }
 }

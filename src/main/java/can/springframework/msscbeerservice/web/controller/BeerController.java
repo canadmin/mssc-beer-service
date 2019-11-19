@@ -1,5 +1,6 @@
 package can.springframework.msscbeerservice.web.controller;
 
+import can.springframework.msscbeerservice.domain.Beer;
 import can.springframework.msscbeerservice.services.BeerService;
 import can.springframework.msscbeerservice.web.model.BeerDto;
 import can.springframework.msscbeerservice.web.model.BeerPageList;
@@ -70,6 +71,10 @@ public class BeerController {
 
     @DeleteMapping("/{beerId}")
     public void deleteBeerById(@PathVariable UUID beerId){
+    }
 
+    @GetMapping("/beerUpc/{upc}")
+    public ResponseEntity<BeerDto> getByUpc(@PathVariable String upc){
+        return new ResponseEntity<BeerDto>(beerService.findByUpc(upc),HttpStatus.OK);
     }
 }
